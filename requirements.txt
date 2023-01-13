@@ -10,3 +10,5 @@ google-api-python-client==2.70.0
 nltk==3.8.1
 pandas==1.5.2
 streamlit==1.16.0
+altair==4.2.0
+plotly==5.11.0
