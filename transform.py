@@ -5,7 +5,7 @@ import googleapiclient.discovery
 import pandas as pd
 import pycountry
 from cleantext import clean
-from langdetect import detect
+from langdetect import detect, LangDetectException
 from textblob import TextBlob
 
 
@@ -28,10 +28,24 @@ def get_sentiment(polarity):
     """
     if polarity > 0:
         return 'POSITIVE'
-    elif polarity < 0:
+    if polarity < 0:
         return 'NEGATIVE'
-    else:
-        return 'NEUTRAL'
+
+    return 'NEUTRAL'
+
+
+def det_lang(language):
+    """ Function to detect language
+    Args:
+        Language column from the dataframe
+    Returns:
+        Detected Language or Other
+    """
+    try:
+        lang = detect(language)
+    except LangDetectException:
+        lang = 'Other'
+    return lang
 
 
 def parse_video(url) -> pd.DataFrame:
@@ -81,28 +95,27 @@ def parse_video(url) -> pd.DataFrame:
             [author, comment, published_at, like_count, reply_count])
 
     df_transform = pd.DataFrame({'Author': [i[0] for i in comments],
-                      'Comment': [i[1] for i in comments],
-                       'Timestamp': [i[2] for i in comments],
-                       'Likes': [i[3] for i in comments],
-                       'TotalReplies': [i[4] for i in comments]})
+                                 'Comment': [i[1] for i in comments],
+                                 'Timestamp': [i[2] for i in comments],
+                                 'Likes': [i[3] for i in comments],
+                                 'TotalReplies': [i[4] for i in comments]})
 
     # Remove extra spaces and make them lower case. Replace special emojis
     df_transform['Comment'] = df_transform['Comment'].apply(lambda x: x.strip().lower().
-                                        replace('xd', '').replace('<3', ''))
+                                                            replace('xd', '').replace('<3', ''))
 
     # Clean text from line breaks, unicodes, emojis and punctuations
     df_transform['Comment'] = df_transform['Comment'].apply(lambda x: clean(x,
-                                                        no_emoji=True,
-                                                        no_punct=True,
-                                                        no_line_breaks=True,
-                                                        fix_unicode=True))
-
+                                                                            no_emoji=True,
+                                                                            no_punct=True,
+                                                                            no_line_breaks=True,
+                                                                            fix_unicode=True))
     # Detect the languages of the comments
-    df_transform['Language'] = df_transform['Comment'].apply(detect)
+    df_transform['Language'] = df_transform['Comment'].apply(det_lang)
 
     # Convert ISO country codes to Languages
     df_transform['Language'] = df_transform['Language'].apply(
-        lambda x: pycountry.languages.get(alpha_2=x).name)
+        lambda x: pycountry.languages.get(alpha_2=x).name if(x) != 'Other' else '')
 
     # Determining the polarity based on english comments
     df_transform['TextBlob_Polarity'] = df_transform[['Comment', 'Language']].apply(
