@@ -7,6 +7,7 @@ import pycountry
 from cleantext import clean
 from langdetect import detect, LangDetectException
 from textblob import TextBlob
+import streamlit as st
 
 
 def get_polarity(text):
@@ -56,15 +57,12 @@ def parse_video(url) -> pd.DataFrame:
       Dataframe with the processed and cleaned values
     """
 
-    # Getting the secret API key
-    api_key = ''
-
     # Get the video_id from the url
     video_id = url.split('?v=')[-1]
 
     # creating youtube resource object
     youtube = googleapiclient.discovery.build(
-        'youtube', 'v3', developerKey=api_key)
+        'youtube', 'v3', developerKey=st.secrets["api_key"])
 
     # retrieve youtube video results
     video_response = youtube.commentThreads().list(
@@ -115,7 +113,11 @@ def parse_video(url) -> pd.DataFrame:
 
     # Convert ISO country codes to Languages
     df_transform['Language'] = df_transform['Language'].apply(
-        lambda x: pycountry.languages.get(alpha_2=x).name if(x) != 'Other' else '')
+        lambda x: pycountry.languages.get(alpha_2=x).name if (x) != 'Other' else 'Not-Detected')
+
+    # Dropping Not detected languages
+    df_transform.drop(
+        df_transform[df_transform['Language'] == 'Not-Detected'].index, inplace=True)
 
     # Determining the polarity based on english comments
     df_transform['TextBlob_Polarity'] = df_transform[['Comment', 'Language']].apply(
