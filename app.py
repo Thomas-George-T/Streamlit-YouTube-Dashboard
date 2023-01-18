@@ -7,7 +7,7 @@ import plotly.graph_objects as go
 import streamlit as st
 from millify import millify
 from transform import parse_video
-from YT_metrics import youtube_metrics
+from yt_metrics import youtube_metrics
 
 st.set_page_config(
     page_title="YouTube Analytics Dashboard",
@@ -17,7 +17,7 @@ st.set_page_config(
 
 st.title('YouTube Analytics Dashboard')
 
-video_url = st.text_input('Enter the URL of the YouTube Video')
+video_url = st.text_input('Enter the URL')
 if video_url:
     with st.spinner('Wait for it...'):
         time.sleep(2)

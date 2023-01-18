@@ -1,8 +1,17 @@
+"""
+Function to get YouTube metrics
+"""
 import googleapiclient.discovery
-import pandas as pd
 import streamlit as st
 
-def youtube_metrics(url)->pd.DataFrame:
+
+def youtube_metrics(url) -> list:
+    """ Function to get views, likes and comment counts
+    Args:
+        URL: url of the youtube video
+    Returns:
+        List containing views, likes and comment counts
+    """
 
     # Get the video_id from the url
     video_id = url.split('?v=')[-1]
@@ -29,6 +38,7 @@ def youtube_metrics(url)->pd.DataFrame:
         metrics.append(item['statistics']['commentCount'])
 
     return metrics
+
 
 if __name__ == "__main__":
     df_main = youtube_metrics('https://www.youtube.com/watch?v=dQw4w9WgXcQ')
