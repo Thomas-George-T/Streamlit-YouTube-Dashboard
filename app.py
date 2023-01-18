@@ -17,10 +17,10 @@ st.set_page_config(
 
 st.title('YouTube Analytics Dashboard')
 
-video_url = st.text_input('Enter the URL')
+video_url = st.text_input('Enter URL', placeholder='Example: https://www.youtube.com/watch?v=Il0S8BoucSA')
 if video_url:
-    with st.spinner('Wait for it...'):
-        time.sleep(2)
+    with st.spinner('Crunching numbers...'):
+        time.sleep(5)
 
     df = parse_video(video_url)
     df_metrics = youtube_metrics(video_url)
@@ -58,9 +58,9 @@ if video_url:
     data_sentiments = sentiments['TextBlob_Sentiment_Type'].value_counts(
     ).rename_axis('Sentiment').reset_index(name='counts')
 
-    palette = {"POSITIVE": "#C0EEE4",
-               "NEGATIVE": "#FFCAC8",
-               "NEUTRAL": "#F8F988"}
+    palette = {"POSITIVE": "#3E6D9C",
+               "NEGATIVE": "#EB455F",
+               "NEUTRAL": "#FCFFE7"}
     fig_sentiment = go.Figure(
         go.Pie(values=data_sentiments['counts'],
                labels=data_sentiments['Sentiment'],
