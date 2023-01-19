@@ -111,5 +111,3 @@ try:
 except RuntimeError:
     st.error(
         ' The URL Should be of the form: https://www.youtube.com/watch?v=videoID', icon="🚨")
-    e = RuntimeError('This is an exception of type RuntimeError')
-    st.exception(e)
