@@ -18,8 +18,8 @@ st.title('YouTube Analytics Dashboard')
 
 VIDEO_URL = st.text_input('Enter URL')
 
-if st.button('Try Example'):
-    VIDEO_URL='https://www.youtube.com/watch?v=dQw4w9WgXcQ'
+if st.button('Example'):
+    VIDEO_URL = 'https://www.youtube.com/watch?v=dQw4w9WgXcQ'
 
 try:
     if VIDEO_URL:
@@ -48,11 +48,22 @@ try:
                 'Language').reset_index(name='count')
 
             options2 = {
+                "tooltip": {
+                    "trigger": 'axis',
+                    "axisPointer": {
+                        "type": 'shadow'
+                    },
+                    "formatter": '{b}: {c}%'
+                },
                 "yAxis": {
                     "type": "category",
                     "data": df_langs['Language'].tolist(),
                 },
-                "xAxis": {"type": "value"},
+                "xAxis": {"type": "value",
+                          "axisTick": {
+                              "alignWithLabel": "true"
+                          }
+                          },
                 "series": [{"data": df_langs['count'].tolist(), "type": "bar"}],
             }
             st_echarts(options=options2, height="500px")
@@ -69,11 +80,15 @@ try:
             data_sentiments = sentiments['TextBlob_Sentiment_Type'].value_counts(
             ).rename_axis('Sentiment').reset_index(name='counts')
 
+            data_sentiments['Review_percent'] = (
+                100. * data_sentiments['counts'] / data_sentiments['counts'].sum()).round(1)
+
             result = data_sentiments.to_json(orient="split")
             parsed = json.loads(result)
 
             options = {
-                "tooltip": {"trigger": "item"},
+                "tooltip": {"trigger": "item",
+                            "formatter": '{d}%'},
                 "legend": {"top": "5%", "left": "center"},
                 "series": [
                     {
@@ -93,13 +108,13 @@ try:
                         "labelLine": {"show": False},
                         "data": [
                             # NEUTRAL
-                            {"value": parsed['data'][1][1],
+                            {"value": parsed['data'][1][2],
                              "name": parsed['data'][1][0]},
                             # POSITIVE
-                            {"value": parsed['data'][0][1],
+                            {"value": parsed['data'][0][2],
                              "name": parsed['data'][0][0]},
                             # NEGATIVE
-                            {"value": parsed['data'][2][1],
+                            {"value": parsed['data'][2][2],
                              "name": parsed['data'][2][0]}
                         ],
                     }
