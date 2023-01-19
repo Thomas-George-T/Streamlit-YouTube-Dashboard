@@ -20,7 +20,7 @@ st.title('YouTube Analytics Dashboard')
 
 video_url = st.text_input('Enter URL')
 
-if st.button('Show Example'):
+if st.button('Sample URL'):
     st.text('https://www.youtube.com/watch?v=dQw4w9WgXcQ')
 
 try:
