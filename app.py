@@ -123,6 +123,6 @@ try:
             st_echarts(
                 options=options, height="500px",
             )
-except RuntimeError:
+except:
     st.error(
         ' The URL Should be of the form: https://www.youtube.com/watch?v=videoID', icon="🚨")
