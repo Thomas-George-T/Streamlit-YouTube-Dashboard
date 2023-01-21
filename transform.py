@@ -67,7 +67,7 @@ def parse_video(url) -> pd.DataFrame:
     # retrieve youtube video results
     video_response = youtube.commentThreads().list(
         part='snippet',
-        maxResults=1000,
+        maxResults=100,
         order='relevance',
         videoId=video_id
     ).execute()
