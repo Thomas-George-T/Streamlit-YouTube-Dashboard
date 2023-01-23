@@ -9,9 +9,7 @@ from transform import parse_video, youtube_metrics
 
 
 st.set_page_config(
-    page_title="YouTube Analytics Dashboard",
-    page_icon=":bar_chart:",
-    layout="wide",
+    page_title="YouTube Analytics Dashboard"
 )
 
 st.title('YouTube Analytics Dashboard')
@@ -40,7 +38,7 @@ try:
             st.subheader("Most liked comments")
             df_top = df[['Author', 'Comment', 'Timestamp', 'Likes']].sort_values(
                 'Likes', ascending=False).reset_index(drop=True)
-            st.table(df_top.head(11))
+            st.dataframe(df_top.head(11))
 
             # Top Languages
             st.subheader("Languages")
@@ -72,7 +70,7 @@ try:
             st.subheader("Most Replied Comments")
             df_replies = df[['Author', 'Comment', 'Timestamp', 'TotalReplies']].sort_values(
                 'TotalReplies', ascending=False).reset_index(drop=True)
-            st.table(df_replies.head(11))
+            st.dataframe(df_replies.head(11))
 
             # Sentiments of the Commentors
             st.subheader("Sentiments")
