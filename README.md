@@ -17,16 +17,16 @@ For the dashboard, the following metrics are calculated:
 - YouTube API
 - Streamlit
 
-## Methodology
+## Design
 There are several steps to how the data pipeline is built. They are as follows:
-- Create an API key with YouTube Data. Version 3 of the API was used for this project.
-- Extract the videoID from a given YouTube URL. This is usually the part that comes after the `v=` in the query string.
-- Using the API key, pull `snippet` and `statistics` from the YouTube API based on the video ID.
+- Create an API key with YouTube Data. Version 3 of the API was used for this project
+- Extract the videoID from a given YouTube URL. This is usually the part that comes after the `v=` in the query string
+- Using the API key, pull `snippet` and `statistics` from the YouTube API based on the video ID
 - `Snippet` from `CommentThreads` contains many apis. We focus mainly on Author, Comments, Timestamp, likes, replies
 - The `videos` api contains important `statistics` like viewCount, Likes and Total Comments
-- After processing all the required information, they are returned as dataframes.
+- After processing all the required information, they are returned as dataframes
 - These dataframes are used as the basis for various visualizations as displayed on the dashboard
-- Using the capabilites of Streamlit
+- Using the capabilites and different components of Streamlit, we design the dashboard.
 
 ## Demo
 The dashboard can be used for any YouTube video and can be viewed on [streamlit](https://thomas-george-t-streamlit-youtube-dashboard-app-n12ivk.streamlit.app)
