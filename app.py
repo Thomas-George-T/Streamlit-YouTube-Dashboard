@@ -45,7 +45,7 @@ try:
             gd1 = GridOptionsBuilder.from_dataframe(df_top.head(11))
             gridoptions1 = gd1.build()
             AgGrid(df_top.head(11), gridOptions=gridoptions1,
-                   theme='streamlit', columns_auto_size_mode='FIT_CONTENTS')
+                   theme='streamlit', columns_auto_size_mode='FIT_CONTENTS', update_mode='NO_UPDATE')
 
             # Top Languages
             st.subheader("Languages")
@@ -82,7 +82,7 @@ try:
             gd2 = GridOptionsBuilder.from_dataframe(df_replies.head(11))
             gridoptions2 = gd2.build()
             AgGrid(df_replies.head(11), gridOptions=gridoptions2,
-                   theme='streamlit', columns_auto_size_mode='FIT_CONTENTS')
+                   theme='streamlit', columns_auto_size_mode='FIT_CONTENTS', update_mode='NO_UPDATE')
 
             # Sentiments of the Commentors
             st.subheader("Reviews")
