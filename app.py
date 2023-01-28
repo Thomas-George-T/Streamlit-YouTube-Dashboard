@@ -5,6 +5,8 @@ import json
 import streamlit as st
 from streamlit_echarts import st_echarts
 from millify import millify
+from st_aggrid import AgGrid
+from st_aggrid.grid_options_builder import GridOptionsBuilder
 from transform import parse_video, youtube_metrics
 
 
@@ -38,7 +40,12 @@ try:
             st.subheader("Most liked comments")
             df_top = df[['Author', 'Comment', 'Timestamp', 'Likes']].sort_values(
                 'Likes', ascending=False).reset_index(drop=True)
-            st.dataframe(df_top.head(11))
+            # st.dataframe(df_top.head(11))
+
+            gd1 = GridOptionsBuilder.from_dataframe(df_top.head(11))
+            gridoptions1 = gd1.build()
+            AgGrid(df_top.head(11), gridOptions=gridoptions1,
+                   theme='streamlit', columns_auto_size_mode='FIT_CONTENTS')
 
             # Top Languages
             st.subheader("Languages")
@@ -70,10 +77,15 @@ try:
             st.subheader("Most Replied Comments")
             df_replies = df[['Author', 'Comment', 'Timestamp', 'TotalReplies']].sort_values(
                 'TotalReplies', ascending=False).reset_index(drop=True)
-            st.dataframe(df_replies.head(11))
+            # st.dataframe(df_replies.head(11))
+
+            gd2 = GridOptionsBuilder.from_dataframe(df_replies.head(11))
+            gridoptions2 = gd2.build()
+            AgGrid(df_replies.head(11), gridOptions=gridoptions2,
+                   theme='streamlit', columns_auto_size_mode='FIT_CONTENTS')
 
             # Sentiments of the Commentors
-            st.subheader("Sentiments")
+            st.subheader("Reviews")
             sentiments = df[df['Language'] == 'English']
             data_sentiments = sentiments['TextBlob_Sentiment_Type'].value_counts(
             ).rename_axis('Sentiment').reset_index(name='counts')
@@ -121,6 +133,7 @@ try:
             st_echarts(
                 options=options, height="500px",
             )
+
 except:
     st.error(
         ' The URL Should be of the form: https://www.youtube.com/watch?v=videoID', icon="🚨")
