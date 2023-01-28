@@ -1,6 +1,22 @@
+![GitHub](https://img.shields.io/github/license/Thomas-George-T/Streamlit-YouTube-Dashboard.svg?style=flat)
+![GitHub top language](https://img.shields.io/github/languages/top/Thomas-George-T/Streamlit-YouTube-Dashboard.svg?style=flat)
+![GitHub last commit](https://img.shields.io/github/last-commit/Thomas-George-T/Streamlit-YouTube-Dashboard.svg?style=flat)
+![ViewCount](https://views.whatilearened.today/views/github/Thomas-George-T/Streamlit-YouTube-Dashboard.svg?cache=remove)
+
 # YouTube Dashboard on Streamlit
 
-Generating analytics based on a YouTube video and displaying the insights as a dashboard app hosted on Streamlit.
+Generating analytics based on a YouTube video and displaying key insights as a dashboard app hosted on Streamlit.
+
+## Components
+<p align="center">  
+    <br>
+	<a href="#">
+        <img height=100 src="https://cdn.svgporn.com/logos/youtube.svg" hspace=20> 
+		    <img src="https://raw.githubusercontent.com/Thomas-George-T/Thomas-George-T/master/assets/python.svg" alt="Python" title="Python" width ="120" />
+        <img height=100 src="https://cdn.svgporn.com/logos/streamlit.svg" hspace=20> 
+  </a>	
+</p>
+
 
 ## Key Performance Indicators (KPI's)
 For the dashboard, the following metrics are calculated:
@@ -12,10 +28,10 @@ For the dashboard, the following metrics are calculated:
 - Most Replied Comments
 - General Sentiment/Review Analysis
 
-## Components
+## Environment
 - Python 3.10
 - YouTube API
-- Streamlit
+- Streamlit cloud
 
 ## Design
 There are several steps to how the data pipeline is built. They are as follows:
@@ -26,7 +42,8 @@ There are several steps to how the data pipeline is built. They are as follows:
 - The `videos` api contains important `statistics` like viewCount, Likes and Total Comments
 - After processing all the required information, they are returned as dataframes
 - These dataframes are used as the basis for various visualizations as displayed on the dashboard
-- Using the capabilites and different components of Streamlit, we design the dashboard.
+- Using the capabilites and different components of Streamlit, we design the dashboard with KPI's
+- Deploy the app for free on [streamlit cloud](https://streamlit.io/cloud)
 
 ## Demo
 The dashboard can be used for any YouTube video and can be viewed on [streamlit](https://thomas-george-t-streamlit-youtube-dashboard-app-n12ivk.streamlit.app)
