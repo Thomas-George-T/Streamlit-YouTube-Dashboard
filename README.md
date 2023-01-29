@@ -5,18 +5,16 @@
 
 # YouTube Dashboard on Streamlit
 
-Generating analytics based on a YouTube video and displaying key insights as a dashboard app hosted on Streamlit.
-
-## Components
 <p align="center">  
     <br>
 	<a href="#">
-        <img height=100 src="https://cdn.svgporn.com/logos/youtube.svg" hspace=20> 
-		    <img src="https://raw.githubusercontent.com/Thomas-George-T/Thomas-George-T/master/assets/python.svg" alt="Python" title="Python" width ="120" />
+        <img height=100 src="https://cdn.svgporn.com/logos/youtube-icon.svg" hspace=20> 
+	<img src="https://raw.githubusercontent.com/Thomas-George-T/Thomas-George-T/master/assets/python.svg" alt="Python" title="Python" width ="120" />
         <img height=100 src="https://cdn.svgporn.com/logos/streamlit.svg" hspace=20> 
   </a>	
 </p>
-
+<br>
+Generating analytics based on a YouTube video and displaying key insights as a dashboard app hosted on Streamlit.
 
 ## Key Performance Indicators (KPI's)
 For the dashboard, the following metrics are calculated:
