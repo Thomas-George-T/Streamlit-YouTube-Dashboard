@@ -44,7 +44,7 @@ There are several steps to how the data pipeline is built. They are as follows:
 - Deploy the app for free on [streamlit cloud](https://streamlit.io/cloud)
 
 ## Demo
-The dashboard can be used for any YouTube video and can be viewed on [streamlit](https://thomas-george-t-streamlit-youtube-dashboard-app-n12ivk.streamlit.app)
+The dashboard can be used for any YouTube video and can be viewed on [streamlit](https://thomas-george-t-youtube-dashboard-app.streamlit.app)
 
 ## Future Scope
 - The YouTube API is limited to only 100 results per page. The workaround for this is to run a loop while processing the results from the first API request. Once this gets patched in the future, the analytics can be extended to show more NLP based Sentimental analysis and more Language related analytics. This is because there would be more data points to go on beyond the initial 100.
