@@ -21,7 +21,7 @@ VIDEO_URL = st.text_input('Enter URL')
 if st.button('Example'):
     VIDEO_URL = 'https://www.youtube.com/watch?v=dQw4w9WgXcQ'
 
-# try:
+try:
     if VIDEO_URL:
         with st.spinner('Crunching numbers...'):
             df = parse_video(VIDEO_URL)
@@ -136,6 +136,6 @@ if st.button('Example'):
                 options=options, height="500px",
             )
 
-# except:
-#     st.error(
-#         ' The URL Should be of the form: https://www.youtube.com/watch?v=videoID', icon="🚨")
+except:
+    st.error(
+        ' The URL Should be of the form: https://www.youtube.com/watch?v=videoID', icon="🚨")
