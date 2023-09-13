@@ -21,7 +21,7 @@ VIDEO_URL = st.text_input('Enter URL')
 if st.button('Example'):
     VIDEO_URL = 'https://www.youtube.com/watch?v=dQw4w9WgXcQ'
 
-try:
+# try:
     if VIDEO_URL:
         with st.spinner('Crunching numbers...'):
             df = parse_video(VIDEO_URL)
@@ -46,7 +46,7 @@ try:
             gridoptions1 = gd1.build()
             AgGrid(df_top.head(11), gridOptions=gridoptions1,
                    theme='streamlit', columns_auto_size_mode='FIT_CONTENTS',
-                    update_mode='NO_UPDATE')
+                   update_mode='NO_UPDATE')
 
             # Top Languages
             st.subheader("Languages")
@@ -84,7 +84,7 @@ try:
             gridoptions2 = gd2.build()
             AgGrid(df_replies.head(11), gridOptions=gridoptions2,
                    theme='streamlit', columns_auto_size_mode='FIT_CONTENTS',
-                    update_mode='NO_UPDATE')
+                   update_mode='NO_UPDATE')
 
             # Sentiments of the Commentors
             st.subheader("Reviews")
@@ -136,6 +136,6 @@ try:
                 options=options, height="500px",
             )
 
-except:
-    st.error(
-        ' The URL Should be of the form: https://www.youtube.com/watch?v=videoID', icon="🚨")
+# except:
+#     st.error(
+#         ' The URL Should be of the form: https://www.youtube.com/watch?v=videoID', icon="🚨")
