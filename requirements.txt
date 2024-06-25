@@ -11,8 +11,8 @@ google-auth==2.15.0
 google-auth-httplib2==0.1.0
 google-auth-oauthlib==0.4.6
 googleapis-common-protos==1.57.0
-pandas==1.5.2
-streamlit==1.17.0
+pandas==2.2.2
+streamlit==1.36.0
 millify==0.1.1
 streamlit-echarts==0.4.0
 streamlit-aggrid==0.3.4.post3
