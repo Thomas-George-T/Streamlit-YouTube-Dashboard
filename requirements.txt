@@ -4,7 +4,7 @@ pycountry==22.3.5
 clean-text==0.6.0
 textblob==0.17.1
 altair==4.2.0
-protobuf==3.20.3
+protobuf>=4.25.8
 google-api-core==2.11.0
 google-api-python-client==2.70.0
 google-auth==2.15.0
