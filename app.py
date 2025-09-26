@@ -1,33 +1,35 @@
 """
 Function to import Transformations and run the streamlit dashboard
 """
+
 import json
 import streamlit as st
 from streamlit_echarts import st_echarts
 from millify import millify
 from st_aggrid import AgGrid
 from st_aggrid.grid_options_builder import GridOptionsBuilder
-from transform import parse_video, youtube_metrics, get_video_published_date, get_delta_str
-
-
-st.set_page_config(
-    page_title="YouTube Analytics Dashboard"
+from transform import (
+    parse_video,
+    youtube_metrics,
+    get_video_published_date,
+    get_delta_str,
 )
 
-st.title('YouTube Analytics Dashboard')
 
-VIDEO_URL = st.text_input('Enter URL')
+st.set_page_config(page_title="YouTube Analytics Dashboard")
 
-if st.button('Example'):
-    VIDEO_URL = 'https://www.youtube.com/watch?v=dQw4w9WgXcQ'
+st.title("YouTube Analytics Dashboard")
+
+VIDEO_URL = st.text_input("Enter URL")
+
+if st.button("Example"):
+    VIDEO_URL = "https://www.youtube.com/watch?v=dQw4w9WgXcQ"
 
 try:
     if VIDEO_URL:
-        with st.spinner('Crunching numbers...'):
+        with st.spinner("Crunching numbers..."):
             df = parse_video(VIDEO_URL)
             df_metrics = youtube_metrics(VIDEO_URL)
-            df_published_date = get_video_published_date(VIDEO_URL)
-            delta_str = get_delta_str(df_published_date)
 
             # Metrics
             col1, col2, col3 = st.columns(3)
@@ -39,79 +41,112 @@ try:
             st.video(VIDEO_URL)
 
             # Published timestamp metric with timezone selector and relative delta
-            tz_choice = st.segmented_control("Timezone", options=["EST", "IST","UTC"], default="UTC")
+            @st.fragment
+            def tz_choice_section():
+                """Fragment to display the timezone selector and the published timestamp metric"""
+                df_published_date = get_video_published_date(VIDEO_URL)
+                delta_str = get_delta_str(df_published_date)
+                tz_choice = st.segmented_control(
+                    "Published",
+                    label_visibility="hidden",
+                    options=["UTC", "EST", "IST"],
+                    default="UTC",
+                    selection_mode="single",
+                )
 
-            st.metric(
-                f"**Published At ({tz_choice})**",
-                df_published_date[tz_choice],
-                delta=delta_str
-            )
+                st.metric(
+                    f"**Published ({tz_choice})**",
+                    df_published_date[tz_choice],
+                    delta=delta_str,
+                )
+
+            tz_choice_section()
 
             # Top Comments
             st.subheader("Most liked comments")
-            df_top = df[['Author', 'Comment', 'Timestamp', 'Likes']].sort_values(
-                'Likes', ascending=False).reset_index(drop=True)
+            df_top = (
+                df[["Author", "Comment", "Timestamp", "Likes"]]
+                .sort_values("Likes", ascending=False)
+                .reset_index(drop=True)
+            )
             # st.dataframe(df_top.head(11))
 
-            gd1 = GridOptionsBuilder.from_dataframe(df_top.head(11))
+            top_11 = df_top.head(11)
+            gd1 = GridOptionsBuilder.from_dataframe(top_11)
+            gd1.configure_auto_height(True)
             gridoptions1 = gd1.build()
-            AgGrid(df_top.head(11), gridOptions=gridoptions1,
-                   theme='streamlit', columns_auto_size_mode='FIT_CONTENTS',
-                   update_mode='NO_UPDATE')
+
+            AgGrid(
+                top_11,
+                gridOptions=gridoptions1,
+                key="top_comments",
+                theme="streamlit",
+                update_on="MANUAL",
+            )
 
             # Top Languages
             st.subheader("Languages")
-            df_langs = df['Language'].value_counts().rename_axis(
-                'Language').reset_index(name='count')
+            df_langs = (
+                df["Language"]
+                .value_counts()
+                .rename_axis("Language")
+                .reset_index(name="count")
+            )
 
             options2 = {
                 "tooltip": {
-                    "trigger": 'axis',
-                    "axisPointer": {
-                        "type": 'shadow'
-                    },
-                    "formatter": '{b}: {c}%'
+                    "trigger": "axis",
+                    "axisPointer": {"type": "shadow"},
+                    "formatter": "{b}: {c}%",
                 },
                 "yAxis": {
                     "type": "category",
-                    "data": df_langs['Language'].tolist(),
+                    "data": df_langs["Language"].tolist(),
                 },
-                "xAxis": {"type": "value",
-                          "axisTick": {
-                              "alignWithLabel": "true"
-                          }
-                          },
-                "series": [{"data": df_langs['count'].tolist(), "type": "bar"}],
+                "xAxis": {"type": "value", "axisTick": {"alignWithLabel": "true"}},
+                "series": [{"data": df_langs["count"].tolist(), "type": "bar"}],
             }
             st_echarts(options=options2, height="500px")
 
             # Most Replied Comments
             st.subheader("Most Replied Comments")
-            df_replies = df[['Author', 'Comment', 'Timestamp', 'TotalReplies']].sort_values(
-                'TotalReplies', ascending=False).reset_index(drop=True)
+            df_replies = (
+                df[["Author", "Comment", "Timestamp", "TotalReplies"]]
+                .sort_values("TotalReplies", ascending=False)
+                .reset_index(drop=True)
+            )
             # st.dataframe(df_replies.head(11))
 
             gd2 = GridOptionsBuilder.from_dataframe(df_replies.head(11))
+            gd2.configure_auto_height(True)
             gridoptions2 = gd2.build()
-            AgGrid(df_replies.head(11), gridOptions=gridoptions2,
-                   theme='streamlit', columns_auto_size_mode='FIT_CONTENTS',
-                   update_mode='NO_UPDATE')
+            AgGrid(
+                df_replies.head(11),
+                gridOptions=gridoptions2,
+                key="top_replies",
+                theme="streamlit",
+                update_on="MANUAL",
+            )
 
             # Sentiments of the Commentors
             st.subheader("Reviews")
-            sentiments = df[df['Language'] == 'English']
-            data_sentiments = sentiments['TextBlob_Sentiment_Type'].value_counts(
-            ).rename_axis('Sentiment').reset_index(name='counts')
+            sentiments = df[df["Language"] == "English"]
+            data_sentiments = (
+                sentiments["TextBlob_Sentiment_Type"]
+                .value_counts()
+                .rename_axis("Sentiment")
+                .reset_index(name="counts")
+            )
 
-            data_sentiments['Review_percent'] = (
-                100. * data_sentiments['counts'] / data_sentiments['counts'].sum()).round(1)
+            data_sentiments["Review_percent"] = (
+                100.0 * data_sentiments["counts"] / data_sentiments["counts"].sum()
+            ).round(1)
 
             result = data_sentiments.to_json(orient="split")
             parsed = json.loads(result)
 
             options = {
-                "tooltip": {"trigger": "item",
-                            "formatter": '{d}%'},
+                "tooltip": {"trigger": "item", "formatter": "{d}%"},
                 "legend": {"top": "5%", "left": "center"},
                 "series": [
                     {
@@ -126,27 +161,41 @@ try:
                         },
                         "label": {"show": False, "position": "center"},
                         "emphasis": {
-                            "label": {"show": True, "fontSize": "30", "fontWeight": "bold"}
+                            "label": {
+                                "show": True,
+                                "fontSize": "30",
+                                "fontWeight": "bold",
+                            }
                         },
                         "labelLine": {"show": False},
                         "data": [
                             # NEUTRAL
-                            {"value": parsed['data'][1][2],
-                             "name": parsed['data'][1][0]},
+                            {
+                                "value": parsed["data"][1][2],
+                                "name": parsed["data"][1][0],
+                            },
                             # POSITIVE
-                            {"value": parsed['data'][0][2],
-                             "name": parsed['data'][0][0]},
+                            {
+                                "value": parsed["data"][0][2],
+                                "name": parsed["data"][0][0],
+                            },
                             # NEGATIVE
-                            {"value": parsed['data'][2][2],
-                             "name": parsed['data'][2][0]}
+                            {
+                                "value": parsed["data"][2][2],
+                                "name": parsed["data"][2][0],
+                            },
                         ],
                     }
                 ],
             }
             st_echarts(
-                options=options, height="500px",
+                options=options,
+                height="500px",
             )
 
-except:
+except Exception as e:
+    st.error(e)
     st.error(
-        ' The URL Should be of the form: https://www.youtube.com/watch?v=videoID', icon="🚨")
+        " The URL Should be of the form: https://www.youtube.com/watch?v=videoID",
+        icon="🚨",
+    )
