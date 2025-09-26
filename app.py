@@ -7,7 +7,7 @@ from streamlit_echarts import st_echarts
 from millify import millify
 from st_aggrid import AgGrid
 from st_aggrid.grid_options_builder import GridOptionsBuilder
-from transform import parse_video, youtube_metrics
+from transform import parse_video, youtube_metrics, get_video_published_date, get_delta_str
 
 
 st.set_page_config(
@@ -26,6 +26,8 @@ try:
         with st.spinner('Crunching numbers...'):
             df = parse_video(VIDEO_URL)
             df_metrics = youtube_metrics(VIDEO_URL)
+            df_published_date = get_video_published_date(VIDEO_URL)
+            delta_str = get_delta_str(df_published_date)
 
             # Metrics
             col1, col2, col3 = st.columns(3)
@@ -35,6 +37,15 @@ try:
 
             # Embedded Video
             st.video(VIDEO_URL)
+
+            # Published timestamp metric with timezone selector and relative delta
+            tz_choice = st.segmented_control("Timezone", options=["EST", "IST","UTC"], default="UTC")
+
+            st.metric(
+                f"**Published At ({tz_choice})**",
+                df_published_date[tz_choice],
+                delta=delta_str
+            )
 
             # Top Comments
             st.subheader("Most liked comments")
