@@ -88,9 +88,17 @@ def parse_video(url) -> pd.DataFrame:
         # Extracting published time
         published_at = item["snippet"]["topLevelComment"]["snippet"]["publishedAt"]
         # Extracting likes
-        like_count = item["snippet"]["topLevelComment"]["snippet"]["likeCount"]
+        like_count = int(
+            (
+                item.get("snippet", {})
+                .get("topLevelComment", {})
+                .get("snippet", {})
+                .get("likeCount", 0)
+            )
+            or 0
+        )
         # Extracting total replies to the comment
-        reply_count = item["snippet"]["totalReplyCount"]
+        reply_count = int((item.get("snippet", {}).get("totalReplyCount", 0)) or 0)
 
         comments.append([author, comment, published_at, like_count, reply_count])
 
@@ -171,11 +179,11 @@ def youtube_metrics(url) -> list:
     # extracting required info from each result object
     for item in statistics_request["items"]:
         # Extracting views
-        metrics.append(item["statistics"]["viewCount"])
+        metrics.append(int((item.get("statistics", {}).get("viewCount", 0)) or 0))
         # Extracting likes
-        metrics.append(item["statistics"]["likeCount"])
+        metrics.append(int((item.get("statistics", {}).get("likeCount", 0)) or 0))
         # Extracting Comments
-        metrics.append(item["statistics"]["commentCount"])
+        metrics.append(int((item.get("statistics", {}).get("commentCount", 0)) or 0))
 
     return metrics
 
