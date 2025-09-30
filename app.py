@@ -194,8 +194,7 @@ try:
             )
 
 except Exception as e:
-    st.error(e)
     st.error(
-        " The URL Should be of the form: https://www.youtube.com/watch?v=videoID",
+        e,
         icon="🚨",
     )

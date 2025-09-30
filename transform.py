@@ -10,6 +10,7 @@ from langdetect import detect, LangDetectException
 from textblob import TextBlob
 import streamlit as st
 from datetime import datetime, timezone
+from urllib.parse import urlparse, parse_qs
 import pytz
 
 
@@ -61,7 +62,7 @@ def parse_video(url) -> pd.DataFrame:
     """
 
     # Get the video_id from the url
-    video_id = url.split("?v=")[-1]
+    video_id = _extract_video_id(url)
 
     # creating youtube resource object
     youtube = googleapiclient.discovery.build(
@@ -87,9 +88,17 @@ def parse_video(url) -> pd.DataFrame:
         # Extracting published time
         published_at = item["snippet"]["topLevelComment"]["snippet"]["publishedAt"]
         # Extracting likes
-        like_count = item["snippet"]["topLevelComment"]["snippet"]["likeCount"]
+        like_count = int(
+            (
+                item.get("snippet", {})
+                .get("topLevelComment", {})
+                .get("snippet", {})
+                .get("likeCount", 0)
+            )
+            or 0
+        )
         # Extracting total replies to the comment
-        reply_count = item["snippet"]["totalReplyCount"]
+        reply_count = int((item.get("snippet", {}).get("totalReplyCount", 0)) or 0)
 
         comments.append([author, comment, published_at, like_count, reply_count])
 
@@ -156,7 +165,7 @@ def youtube_metrics(url) -> list:
     """
 
     # Get the video_id from the url
-    video_id = url.split("?v=")[-1]
+    video_id = _extract_video_id(url)
 
     # creating youtube resource object
     youtube = googleapiclient.discovery.build(
@@ -170,11 +179,11 @@ def youtube_metrics(url) -> list:
     # extracting required info from each result object
     for item in statistics_request["items"]:
         # Extracting views
-        metrics.append(item["statistics"]["viewCount"])
+        metrics.append(int((item.get("statistics", {}).get("viewCount", 0)) or 0))
         # Extracting likes
-        metrics.append(item["statistics"]["likeCount"])
+        metrics.append(int((item.get("statistics", {}).get("likeCount", 0)) or 0))
         # Extracting Comments
-        metrics.append(item["statistics"]["commentCount"])
+        metrics.append(int((item.get("statistics", {}).get("commentCount", 0)) or 0))
 
     return metrics
 
@@ -229,7 +238,7 @@ def get_video_published_date(url):
         original UTC ISO timestamp under key 'UTC_ISO'
     """
     # Get the video_id from the url
-    video_id = url.split("?v=")[-1]
+    video_id = _extract_video_id(url)
 
     youtube = googleapiclient.discovery.build(
         "youtube", "v3", developerKey=st.secrets["api_key"]
@@ -244,6 +253,57 @@ def get_video_published_date(url):
         return converted_times
     else:
         raise ValueError("Video not found")
+
+
+def _is_valid_video_id(candidate: str) -> bool:
+    if len(candidate) != 11:
+        return False
+    for ch in candidate:
+        if not (ch.isalnum() or ch in ['-', '_']):
+            return False
+    return True
+
+
+def _extract_video_id(input_url: str) -> str:
+    """Extract a robust YouTube video ID from various URL formats.
+
+    Supports:
+    - https://www.youtube.com/watch?v=ID&...
+    - https://youtu.be/ID
+    - https://www.youtube.com/shorts/ID
+    - https://www.youtube.com/embed/ID
+    - Raw 11-char ID
+    """
+    if not input_url:
+        return None
+    parsed = urlparse(input_url)
+
+    # Raw ID fallback
+    raw = input_url.strip()
+    if _is_valid_video_id(raw):
+        return raw
+
+    # watch?v=ID
+    if parsed.query:
+        qs = parse_qs(parsed.query)
+        vid = qs.get('v', [None])[0]
+        if vid and _is_valid_video_id(vid):
+            return vid
+
+    # Path-based formats
+    host = (parsed.hostname or '').lower()
+    path_parts = [p for p in (parsed.path or '').split('/') if p]
+
+    if host in ('youtu.be', 'www.youtu.be') and path_parts:
+        candidate = path_parts[0]
+        return candidate if _is_valid_video_id(candidate) else None
+
+    if host.endswith('youtube.com') and path_parts:
+        if path_parts[0] in ('shorts', 'embed', 'v') and len(path_parts) > 1:
+            candidate = path_parts[1]
+            return candidate if _is_valid_video_id(candidate) else None
+
+    return None
 
 
 def get_delta_str(published_date):
