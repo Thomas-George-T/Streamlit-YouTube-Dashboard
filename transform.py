@@ -248,9 +248,16 @@ def get_video_published_date(url):
     response = request.execute()
 
     if response["items"]:
-        published_at = response["items"][0]["snippet"]["publishedAt"]
+        snippet = response["items"][0]["snippet"]
+        published_at = snippet["publishedAt"]
         converted_times = convert_timestamp(published_at)
-        return converted_times
+        title = snippet.get("title", "")
+        creator = snippet.get("channelTitle", "")
+        return {
+            **converted_times,
+            "Title": title,
+            "Creator": creator,
+        }
     else:
         raise ValueError("Video not found")
 

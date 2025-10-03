@@ -14,6 +14,7 @@ from transform import (
     get_video_published_date,
     get_delta_str,
 )
+import pandas as pd
 
 
 st.set_page_config(page_title="YouTube Analytics Dashboard")
@@ -46,6 +47,12 @@ try:
                 """Fragment to display the timezone selector and the published timestamp metric"""
                 df_published_date = get_video_published_date(VIDEO_URL)
                 delta_str = get_delta_str(df_published_date)
+                title = df_published_date.get("Title", "")
+                creator = df_published_date.get("Creator", "")
+                if title:
+                    st.subheader(title)
+                if creator:
+                    st.markdown(f"**Creator:** {creator}")
                 tz_choice = st.segmented_control(
                     "Published",
                     label_visibility="hidden",
@@ -142,8 +149,23 @@ try:
                 100.0 * data_sentiments["counts"] / data_sentiments["counts"].sum()
             ).round(1)
 
-            result = data_sentiments.to_json(orient="split")
-            parsed = json.loads(result)
+            # Build chart data safely without assuming fixed category positions
+            if "No sentiment data" in data_sentiments["Sentiment"].values:
+                data_list = [
+                    {
+                        "value": int(data_sentiments["counts"].iloc[0]),
+                        "name": "No sentiment data",
+                    }
+                ]
+            else:
+                percent_map = {
+                    row["Sentiment"]: float(row["Review_percent"]) for _, row in data_sentiments.iterrows()
+                }
+                data_list = [
+                    {"value": percent_map.get("NEUTRAL", 0.0), "name": "NEUTRAL"},
+                    {"value": percent_map.get("POSITIVE", 0.0), "name": "POSITIVE"},
+                    {"value": percent_map.get("NEGATIVE", 0.0), "name": "NEGATIVE"},
+                ]
 
             options = {
                 "tooltip": {"trigger": "item", "formatter": "{d}%"},
@@ -168,23 +190,7 @@ try:
                             }
                         },
                         "labelLine": {"show": False},
-                        "data": [
-                            # NEUTRAL
-                            {
-                                "value": parsed["data"][1][2],
-                                "name": parsed["data"][1][0],
-                            },
-                            # POSITIVE
-                            {
-                                "value": parsed["data"][0][2],
-                                "name": parsed["data"][0][0],
-                            },
-                            # NEGATIVE
-                            {
-                                "value": parsed["data"][2][2],
-                                "name": parsed["data"][2][0],
-                            },
-                        ],
+                        "data": data_list,
                     }
                 ],
             }
